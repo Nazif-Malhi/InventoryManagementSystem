@@ -58,6 +58,7 @@
     <Compile Include="CategoryModuleForm.Designer.cs">
       <DependentUpon>CategoryModuleForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Connection.cs" />
     <Compile Include="CustomerButton.cs">
       <SubType>Component</SubType>
     </Compile>

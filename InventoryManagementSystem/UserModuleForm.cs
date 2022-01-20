@@ -13,8 +13,7 @@ namespace InventoryManagementSystem
 {
     public partial class UserModuleForm : Form
     {
-
-        SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Nazif\Downloads\Compressed\InventoryManagementSystem\InventoryManagementSystem\Tutorial Database\dbIMS.mdf;Integrated Security=True;Connect Timeout=30");
+        SqlConnection con = new SqlConnection(Connection.ConnectionString);
         SqlCommand cm = new SqlCommand();
         public UserModuleForm()
         {
