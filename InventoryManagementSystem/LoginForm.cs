@@ -13,12 +13,14 @@ namespace InventoryManagementSystem
 {
     public partial class LoginForm : Form
     {
+        
         SqlConnection con = new SqlConnection(Connection.ConnectionString);
         SqlCommand cm = new SqlCommand();
         SqlDataReader dr;
         public LoginForm()
         {
             InitializeComponent();
+            
         }
 
         private void checkBoxPass_CheckedChanged(object sender, EventArgs e)

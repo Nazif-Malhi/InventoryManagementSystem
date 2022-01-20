@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,16 @@ namespace InventoryManagementSystem
             timer1.Start();
         }
         int startPoint = 0;
+
+        private void check_Database() {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var subFolderPath = Path.Combine(path, @"Inventory Managment System\Data\Database\dbIMS.mdf");
+            FileInfo file = new FileInfo(subFolderPath);
+            if (!file.Exists)
+            {
+                MessageBox.Show("No Database Found");
+            }
+        }
         private void timer1_Tick(object sender, EventArgs e)
         {
             startPoint += 2;
@@ -28,6 +39,7 @@ namespace InventoryManagementSystem
                 timer1.Stop();
                 LoginForm login = new LoginForm();
                 this.Hide();
+                check_Database();
                 login.ShowDialog();
             }
         }
