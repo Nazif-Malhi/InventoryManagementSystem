@@ -21,6 +21,7 @@ namespace InventoryManagementSystem
         int number = 1;
         ArrayList datagridValues = new ArrayList();
         ArrayList totalPriceOfCart = new ArrayList();
+        private string reciptNumber = "";
         public OrderModuleForm()
         {
             InitializeComponent();
@@ -103,12 +104,18 @@ namespace InventoryManagementSystem
 
         private void dgvCustomer_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            //If this is header row or new row, do nothing
+            if (e.RowIndex < 0 || e.RowIndex == this.cart_DataGridView.NewRowIndex)
+                return;
             txtCId.Text = dgvCustomer.Rows[e.RowIndex].Cells[1].Value.ToString();
             txtCName.Text = dgvCustomer.Rows[e.RowIndex].Cells[2].Value.ToString();
         }
 
         private void dgvProduct_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            //If this is header row or new row, do nothing
+            if (e.RowIndex < 0 || e.RowIndex == this.cart_DataGridView.NewRowIndex)
+                return;
             txtPid.Text = dgvProduct.Rows[e.RowIndex].Cells[1].Value.ToString();
             txtPName.Text = dgvProduct.Rows[e.RowIndex].Cells[2].Value.ToString();
             txtPrice.Text = dgvProduct.Rows[e.RowIndex].Cells[4].Value.ToString();
@@ -116,8 +123,29 @@ namespace InventoryManagementSystem
             txtTotal.Text = total.ToString();
         }
 
-      
+        private readonly Random _random = new Random();
 
+        public string RandomString(int size = 4, bool lowerCase = false)
+        {
+            var builder = new StringBuilder(size);
+
+            // Unicode/ASCII Letters are divided into two blocks
+            // (Letters 65–90 / 97–122):
+            // The first group containing the uppercase letters and
+            // the second group containing the lowercase.  
+
+            // char is a single Unicode character  
+            char offset = lowerCase ? 'a' : 'A';
+            const int lettersOffset = 26; // A...Z or a..z: length=26  
+
+            for (var i = 0; i < size; i++)
+            {
+                var @char = (char)_random.Next(offset, offset + lettersOffset);
+                builder.Append(@char);
+            }
+            int num = _random.Next(9999);
+            return lowerCase ? builder.ToString().ToLower() : builder.ToString() +""+ num.ToString();
+        }
         private void btnInsert_Click(object sender, EventArgs e)
         {
             try
@@ -134,28 +162,30 @@ namespace InventoryManagementSystem
                 }
                 if (MessageBox.Show("Are you sure you want to insert this order?", "Saving Record", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
+                    reciptNumber = RandomString();
+                    //cm = new SqlCommand("INSERT INTO tbOrder(odate, pid, cid, qty, price, total)VALUES(@odate, @pid, @cid, @qty, @price, @total)", con);
+                    //cm.Parameters.AddWithValue("@odate", dtOrder.Value);
+                    //cm.Parameters.AddWithValue("@pid", Convert.ToInt32(txtPid.Text));
+                    //cm.Parameters.AddWithValue("@cid", Convert.ToInt32(txtCId.Text));
+                    //cm.Parameters.AddWithValue("@qty", Convert.ToInt32(UDQty.Value));
+                    //cm.Parameters.AddWithValue("@price", Convert.ToInt32(txtPrice.Text));
+                    //cm.Parameters.AddWithValue("@total", Convert.ToInt32(txtTotal.Text));
+                    //cm.Parameters.AddWithValue("@receiptID", reciptNumber.ToString());
+                    //con.Open();
+                    //cm.ExecuteNonQuery();
+                    //con.Close();
+                    //MessageBox.Show("Order has been successfully inserted.");
 
-                    cm = new SqlCommand("INSERT INTO tbOrder(odate, pid, cid, qty, price, total)VALUES(@odate, @pid, @cid, @qty, @price, @total)", con);
-                    cm.Parameters.AddWithValue("@odate", dtOrder.Value);
-                    cm.Parameters.AddWithValue("@pid", Convert.ToInt32(txtPid.Text));
-                    cm.Parameters.AddWithValue("@cid", Convert.ToInt32(txtCId.Text));
-                    cm.Parameters.AddWithValue("@qty", Convert.ToInt32(UDQty.Value));
-                    cm.Parameters.AddWithValue("@price", Convert.ToInt32(txtPrice.Text));
-                    cm.Parameters.AddWithValue("@total", Convert.ToInt32(txtTotal.Text));
-                    con.Open();
-                    cm.ExecuteNonQuery();
-                    con.Close();
-                    MessageBox.Show("Order has been successfully inserted.");
-                    
 
-                    cm = new SqlCommand("UPDATE tbProduct SET pqty=(pqty-@pqty) WHERE pid LIKE '"+ txtPid.Text +"' ", con);                    
-                    cm.Parameters.AddWithValue("@pqty", Convert.ToInt16(UDQty.Value));
-                   
+                    //cm = new SqlCommand("UPDATE tbProduct SET pqty=(pqty-@pqty) WHERE pid LIKE '"+ txtPid.Text +"' ", con);                    
+                    //cm.Parameters.AddWithValue("@pqty", Convert.ToInt16(UDQty.Value));
+                    printDocumentMethod();
                     con.Open();
                     cm.ExecuteNonQuery();
                     con.Close();
                     Clear();
                     LoadProduct();
+                    cart_DataGridView.Rows.Clear();
 
                 }
 
@@ -164,8 +194,12 @@ namespace InventoryManagementSystem
             {
                 MessageBox.Show(ex.Message);
             }
+            
         }
-
+        private void printDocumentMethod() {
+            printPreviewDialog1.Document = printDocument1;
+            printPreviewDialog1.ShowDialog();
+        }
         public void Clear()
         {
             txtCId.Clear();
@@ -175,9 +209,10 @@ namespace InventoryManagementSystem
             txtPName.Clear();
 
             txtPrice.Clear();
-            UDQty.Value = 0;
+            UDQty.Value = 1;
             txtTotal.Clear();
             dtOrder.Value = DateTime.Now;
+
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -241,7 +276,11 @@ namespace InventoryManagementSystem
             datagridValues.Clear();
             totalPriceOfCart.Clear(); 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cart_DataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             //If this is header row or new row, do nothing
@@ -258,6 +297,225 @@ namespace InventoryManagementSystem
 
                 cart_DataGridView.Rows.RemoveAt(e.RowIndex);
                 totalCalculation();
+            }
+        }
+        StringFormat strFormat;
+        ArrayList arrColumnLefts = new ArrayList();
+        ArrayList arrColumnWidths = new ArrayList();
+        int iCellHeight, iCount, iTotalWidth, iHeaderHeight, iRow;
+        bool bFirstPage, bNewPage;
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            
+
+            try
+            {
+                //Set the left margin
+                int iLeftMargin = e.MarginBounds.Left;
+                //Set the top margin
+                int iTopMargin = e.MarginBounds.Top;
+                //Whether more pages have to print or not
+                bool bMorePagesToPrint = false;
+                int iTmpWidth = 0;
+
+                //For the first page to print set the cell width and header height
+                if (bFirstPage)
+                {
+                    foreach (DataGridViewColumn GridCol in cart_DataGridView.Columns)
+                    {
+                        iTmpWidth = (int)(Math.Floor((double)((double)GridCol.Width /
+                            (double)iTotalWidth * (double)iTotalWidth *
+                            ((double)e.MarginBounds.Width / (double)iTotalWidth))));
+
+                        iHeaderHeight = (int)(e.Graphics.MeasureString(GridCol.HeaderText,
+                            GridCol.InheritedStyle.Font, iTmpWidth).Height) + 11;
+
+                        // Save width and height of headers
+                        arrColumnLefts.Add(iLeftMargin);
+                        arrColumnWidths.Add(iTmpWidth);
+                        iLeftMargin += iTmpWidth;
+                    }
+                }
+                //Loop till all the grid rows not get printed
+                while (iRow <= cart_DataGridView.Rows.Count - 1)
+                {
+                    DataGridViewRow GridRow = cart_DataGridView.Rows[iRow];
+                    //Set the cell height
+                    iCellHeight = GridRow.Height + 5;
+                    int iCount = 0;
+                    //Check whether the current page settings allows more rows to print
+                    if (iTopMargin + iCellHeight >= e.MarginBounds.Height + e.MarginBounds.Top)
+                    {
+                        bNewPage = true;
+                        bFirstPage = false;
+                        bMorePagesToPrint = true;
+                        break;
+                    }
+                    else
+                    {
+                        if (bNewPage)
+                        {
+                            e.Graphics.DrawString("Gillani Book Shop", new Font("Arial", 22, FontStyle.Regular), Brushes.Black, new Point(280, 0));
+                            //Draw Header
+                            e.Graphics.DrawString("Customer : "+txtCName.Text,
+                                new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                Brushes.Black, e.MarginBounds.Left,
+                                e.MarginBounds.Top - e.Graphics.MeasureString("Gillani Book Shop",
+                                new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                e.MarginBounds.Width).Height - 13);
+
+                            String strDate = DateTime.Now.ToLongDateString() + " " +
+                                DateTime.Now.ToShortTimeString();
+                            //Draw Date
+                            e.Graphics.DrawString(strDate,
+                                new Font(cart_DataGridView.Font, FontStyle.Bold), 
+                                Brushes.Black, e.MarginBounds.Left +
+                                (e.MarginBounds.Width - e.Graphics.MeasureString(strDate,
+                                new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                e.MarginBounds.Width).Width),
+                                e.MarginBounds.Top - e.Graphics.MeasureString("Gillani Book Shop",
+                                new Font(new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                FontStyle.Bold), e.MarginBounds.Width).Height - 13);
+                            //Draw Receipt Number
+                            e.Graphics.DrawString("Receipt Number : " + reciptNumber,
+                                new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                Brushes.Black,300,
+                                e.MarginBounds.Top - e.Graphics.MeasureString("Gillani Book Shop",
+                                new Font(new Font(cart_DataGridView.Font, FontStyle.Bold),
+                                FontStyle.Bold), e.MarginBounds.Width).Height - 13);
+
+                            //Draw Columns                 
+                            iTopMargin = e.MarginBounds.Top;
+                            for (int i = 0; i < cart_DataGridView.Columns.Count - 1; i++)
+                            {
+                                e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
+                                    new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                                    (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                                e.Graphics.DrawRectangle(Pens.Black,
+                                    new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                                    (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                                e.Graphics.DrawString(cart_DataGridView.Columns[i].HeaderText,
+                                    cart_DataGridView.Columns[i].InheritedStyle.Font,
+                                    new SolidBrush(cart_DataGridView.Columns[i].InheritedStyle.ForeColor),
+                                    new RectangleF((int)arrColumnLefts[iCount], iTopMargin,
+                                    (int)arrColumnWidths[iCount], iHeaderHeight), strFormat);
+                                iCount++;
+                            }
+                            /// <summary>
+                            /// If To Draw all Data Grid use foreach Loop to show instead of for loop
+                            /// </summary>
+                            /// <param name="sender"></param>
+                            /// <param name="e"></param>
+                            //foreach (DataGridViewColumn GridCol in cart_DataGridView.Columns)
+                            //{
+                            //    e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
+                            //        new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                            //        (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                            //    e.Graphics.DrawRectangle(Pens.Black,
+                            //        new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                            //        (int)arrColumnWidths[iCount], iHeaderHeight));
+
+                            //    e.Graphics.DrawString(GridCol.HeaderText,
+                            //        GridCol.InheritedStyle.Font,
+                            //        new SolidBrush(GridCol.InheritedStyle.ForeColor),
+                            //        new RectangleF((int)arrColumnLefts[iCount], iTopMargin,
+                            //        (int)arrColumnWidths[iCount], iHeaderHeight), strFormat);
+                            //    iCount++;
+                            //}
+                            bNewPage = false;
+                            iTopMargin += iHeaderHeight;
+                        }
+                        iCount = 0;
+                        //Draw Columns Contents
+                        for (int i = 0; i < GridRow.Cells.Count - 1; i++)
+                        {
+                            if (GridRow.Cells[i].Value != null)
+                            {
+                                e.Graphics.DrawString(GridRow.Cells[i].Value.ToString(),
+                                    GridRow.Cells[i].InheritedStyle.Font,
+                                    new SolidBrush(GridRow.Cells[i].InheritedStyle.ForeColor),
+                                    new RectangleF((int)arrColumnLefts[iCount],
+                                    (float)iTopMargin,
+                                    (int)arrColumnWidths[iCount], (float)iCellHeight),
+                                    strFormat);
+                            }
+                            //Drawing Cells Borders 
+                            e.Graphics.DrawRectangle(Pens.Black,
+                                new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                                (int)arrColumnWidths[iCount], iCellHeight));
+                            iCount++;
+                        }
+                        /// <summary>
+                        /// If To Draw all Data Grid use foreach Loop to show instead of for loop
+                        /// </summary>
+                        /// <param name="sender"></param>
+                        /// <param name="e"></param>
+                        //foreach (DataGridViewCell Cel in GridRow.Cells)
+                        //{
+                            //if (Cel.Value != null)
+                            //{
+                            //    e.Graphics.DrawString(Cel.Value.ToString(),
+                            //        Cel.InheritedStyle.Font,
+                            //        new SolidBrush(Cel.InheritedStyle.ForeColor),
+                            //        new RectangleF((int)arrColumnLefts[iCount],
+                            //        (float)iTopMargin,
+                            //        (int)arrColumnWidths[iCount], (float)iCellHeight),
+                            //        strFormat);
+                            //}
+                            ////Drawing Cells Borders 
+                            //e.Graphics.DrawRectangle(Pens.Black,
+                            //    new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
+                            //    (int)arrColumnWidths[iCount], iCellHeight));
+                            //iCount++;
+                        //}
+                    }
+                    iRow++;
+                    iTopMargin += iCellHeight;
+                }
+                //If more lines exist, print another page.
+                if (bMorePagesToPrint)
+                    e.HasMorePages = true;
+                else
+                    e.HasMorePages = false;
+                e.Graphics.DrawString("Total : " + totalPriceOfCart_TextBox.Text, new Font("Arial", 16, FontStyle.Regular), Brushes.Black, new Point(500, iTopMargin));
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK,
+                   MessageBoxIcon.Error);
+            }
+
+        }
+       
+        private void printDocument1_BeginPrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        {
+            try
+            {
+                strFormat = new StringFormat();
+                strFormat.Alignment = StringAlignment.Near;
+                strFormat.LineAlignment = StringAlignment.Center;
+                strFormat.Trimming = StringTrimming.EllipsisCharacter;
+
+                arrColumnLefts.Clear();
+                arrColumnWidths.Clear();
+                iCellHeight = 0;
+                iCount = 0;
+                bFirstPage = true;
+                bNewPage = true;
+
+                // Calculating Total Widths
+                iTotalWidth = 0;
+                foreach (DataGridViewColumn dgvGridCol in cart_DataGridView.Columns)
+                {
+                    iTotalWidth += dgvGridCol.Width;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
