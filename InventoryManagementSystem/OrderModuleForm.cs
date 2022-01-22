@@ -163,22 +163,33 @@ namespace InventoryManagementSystem
                 if (MessageBox.Show("Are you sure you want to insert this order?", "Saving Record", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     reciptNumber = RandomString();
-                    //cm = new SqlCommand("INSERT INTO tbOrder(odate, pid, cid, qty, price, total)VALUES(@odate, @pid, @cid, @qty, @price, @total)", con);
-                    //cm.Parameters.AddWithValue("@odate", dtOrder.Value);
-                    //cm.Parameters.AddWithValue("@pid", Convert.ToInt32(txtPid.Text));
-                    //cm.Parameters.AddWithValue("@cid", Convert.ToInt32(txtCId.Text));
-                    //cm.Parameters.AddWithValue("@qty", Convert.ToInt32(UDQty.Value));
-                    //cm.Parameters.AddWithValue("@price", Convert.ToInt32(txtPrice.Text));
-                    //cm.Parameters.AddWithValue("@total", Convert.ToInt32(txtTotal.Text));
-                    //cm.Parameters.AddWithValue("@receiptID", reciptNumber.ToString());
-                    //con.Open();
-                    //cm.ExecuteNonQuery();
-                    //con.Close();
-                    //MessageBox.Show("Order has been successfully inserted.");
+                    cm = new SqlCommand("INSERT INTO tbOrder(odate, pid, cid, qty, price, total, receiptID ) VALUES (@odate, @pid, @cid, @qty, @price, @total, @receiptID)", con);
+                    
+                    //
+                    //
+                    //
+                    for (int i = 0; i < cart_DataGridView.Rows.Count; i++)
+                    {
+                        cm.Parameters.AddWithValue("@odate", dtOrder.Value);
+                        //
+                        cm.Parameters.AddWithValue("@cid", Convert.ToInt32(txtCId.Text));
+                        cm.Parameters.AddWithValue("@pid", Convert.ToInt32(cart_DataGridView.Rows[i].Cells[5].Value));
+                        cm.Parameters.AddWithValue("@qty", Convert.ToInt32(cart_DataGridView.Rows[i].Cells[2].Value));
+                        cm.Parameters.AddWithValue("@price", Convert.ToInt32(cart_DataGridView.Rows[i].Cells[3].Value));
+                        cm.Parameters.AddWithValue("@total", Convert.ToInt32(cart_DataGridView.Rows[i].Cells[4].Value));
+                        //
+                        cm.Parameters.AddWithValue("@receiptID", reciptNumber.ToString());
+                        con.Open();
+                        cm.ExecuteNonQuery();
+                        con.Close();
+                        cm.Parameters.Clear();
+                    }
+                    
+                    MessageBox.Show("Order has been successfully inserted.");
 
 
-                    //cm = new SqlCommand("UPDATE tbProduct SET pqty=(pqty-@pqty) WHERE pid LIKE '"+ txtPid.Text +"' ", con);                    
-                    //cm.Parameters.AddWithValue("@pqty", Convert.ToInt16(UDQty.Value));
+                    cm = new SqlCommand("UPDATE tbProduct SET pqty=(pqty-@pqty) WHERE pid LIKE '" + txtPid.Text + "' ", con);
+                    cm.Parameters.AddWithValue("@pqty", Convert.ToInt16(UDQty.Value));
                     printDocumentMethod();
                     con.Open();
                     cm.ExecuteNonQuery();
@@ -246,17 +257,20 @@ namespace InventoryManagementSystem
                 string firstColumn = txtPName.Text;
                 datagridValues.Add(firstColumn);
                 string secondColumn = UDQty.Text;
-                string thirdColumn = "";
+                string thirdColumn = txtPrice.Text;
+                string fourthColumn = "";
                 if (txtTotal.Text == "")
                 {
-                    thirdColumn = txtPrice.Text;
+                    fourthColumn = txtPrice.Text;
                 }
                 else
                 {
-                    thirdColumn = txtTotal.Text;
+                    fourthColumn = txtTotal.Text;
                 }
-                totalPriceOfCart.Add(Convert.ToInt32(thirdColumn));
-                string[] rows = { serialColumn, firstColumn, secondColumn, thirdColumn };
+                totalPriceOfCart.Add(Convert.ToInt32(fourthColumn));
+                
+                string fifthColumn = txtPid.Text;
+                string[] rows = { serialColumn, firstColumn, secondColumn, thirdColumn,fourthColumn,fifthColumn };
                 cart_DataGridView.Rows.Add(rows);
                 totalCalculation();
             }
@@ -288,12 +302,12 @@ namespace InventoryManagementSystem
                 return;
 
             //If formatting your desired column, set the value
-            if (e.ColumnIndex == 4)
+            if (e.ColumnIndex == 6)
             {
                 
                 datagridValues.Remove(cart_DataGridView.Rows[e.RowIndex].Cells[1].Value.ToString());
                 totalPriceOfCart.Remove(Convert.ToInt32(cart_DataGridView.Rows[e.RowIndex].Cells[3].Value));
-                MessageBox.Show("The Value from Grid is : " + cart_DataGridView.Rows[e.RowIndex].Cells[3].Value.ToString());
+                //MessageBox.Show("The Value from Grid is : " + cart_DataGridView.Rows[e.RowIndex].Cells[3].Value.ToString());
 
                 cart_DataGridView.Rows.RemoveAt(e.RowIndex);
                 totalCalculation();
