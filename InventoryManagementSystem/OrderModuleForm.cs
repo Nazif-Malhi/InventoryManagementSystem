@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,6 +18,9 @@ namespace InventoryManagementSystem
         SqlCommand cm = new SqlCommand();
         SqlDataReader dr;
         int qty = 0;
+        int number = 1;
+        ArrayList datagridValues = new ArrayList();
+        ArrayList totalPriceOfCart = new ArrayList();
         public OrderModuleForm()
         {
             InitializeComponent();
@@ -75,17 +79,25 @@ namespace InventoryManagementSystem
         
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            GetQty();
-            if (Convert.ToInt16(UDQty.Value) > qty)
+            if (UDQty.Value <= 0)
             {
-                MessageBox.Show("Instock quantity is not enough!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                UDQty.Value = UDQty.Value - 1;
-                return;
+                MessageBox.Show("Please Do greater than 0");
+                UDQty.Value = 1;
             }
-            if (Convert.ToInt16(UDQty.Value) > 0)
+            else
             {
-                int total = Convert.ToInt16(txtPrice.Text) * Convert.ToInt16(UDQty.Value);
-                txtTotal.Text = total.ToString();
+                GetQty();
+                if (Convert.ToInt16(UDQty.Value) > qty)
+                {
+                    MessageBox.Show("Instock quantity is not enough!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    UDQty.Value = UDQty.Value - 1;
+                    return;
+                }
+                if (Convert.ToInt16(UDQty.Value) > 0)
+                {
+                    int total = Convert.ToInt16(txtPrice.Text) * Convert.ToInt16(UDQty.Value);
+                    txtTotal.Text = total.ToString();
+                }
             }
         }
 
@@ -99,7 +111,9 @@ namespace InventoryManagementSystem
         {
             txtPid.Text = dgvProduct.Rows[e.RowIndex].Cells[1].Value.ToString();
             txtPName.Text = dgvProduct.Rows[e.RowIndex].Cells[2].Value.ToString();
-            txtPrice.Text = dgvProduct.Rows[e.RowIndex].Cells[4].Value.ToString();            
+            txtPrice.Text = dgvProduct.Rows[e.RowIndex].Cells[4].Value.ToString();
+            int total = Convert.ToInt16(txtPrice.Text) * Convert.ToInt16(UDQty.Value);
+            txtTotal.Text = total.ToString();
         }
 
       
@@ -184,6 +198,67 @@ namespace InventoryManagementSystem
             con.Close();
         }
 
-     
+        private void car_button_Click(object sender, EventArgs e)
+        {
+            number++;
+            if (datagridValues.Contains(txtPName.Text))
+            {
+                MessageBox.Show("This Item Present in The List Please select another or delete to insert Again");
+            }
+            else
+            {
+                string serialColumn = number.ToString();
+                string firstColumn = txtPName.Text;
+                datagridValues.Add(firstColumn);
+                string secondColumn = UDQty.Text;
+                string thirdColumn = "";
+                if (txtTotal.Text == "")
+                {
+                    thirdColumn = txtPrice.Text;
+                }
+                else
+                {
+                    thirdColumn = txtTotal.Text;
+                }
+                totalPriceOfCart.Add(Convert.ToInt32(thirdColumn));
+                string[] rows = { serialColumn, firstColumn, secondColumn, thirdColumn };
+                cart_DataGridView.Rows.Add(rows);
+                totalCalculation();
+            }
+        }
+
+        private void totalCalculation() {
+            int cal = 0;
+            foreach (int item in totalPriceOfCart)
+            {
+                cal = cal + item;
+            }
+            totalPriceOfCart_TextBox.Text =  cal.ToString();
+        }
+        private void clear_DataGrid_Click(object sender, EventArgs e)
+        {
+            cart_DataGridView.Rows.Clear();
+            datagridValues.Clear();
+            totalPriceOfCart.Clear(); 
+        }
+
+        private void cart_DataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            //If this is header row or new row, do nothing
+            if (e.RowIndex < 0 || e.RowIndex == this.cart_DataGridView.NewRowIndex)
+                return;
+
+            //If formatting your desired column, set the value
+            if (e.ColumnIndex == 4)
+            {
+                
+                datagridValues.Remove(cart_DataGridView.Rows[e.RowIndex].Cells[1].Value.ToString());
+                totalPriceOfCart.Remove(Convert.ToInt32(cart_DataGridView.Rows[e.RowIndex].Cells[3].Value));
+                MessageBox.Show("The Value from Grid is : " + cart_DataGridView.Rows[e.RowIndex].Cells[3].Value.ToString());
+
+                cart_DataGridView.Rows.RemoveAt(e.RowIndex);
+                totalCalculation();
+            }
+        }
     }
 }
