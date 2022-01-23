@@ -54,13 +54,13 @@ namespace InventoryManagementSystem
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Fredoka One", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
             this.label1.LiveSetting = System.Windows.Forms.Automation.AutomationLiveSetting.Polite;
             this.label1.Location = new System.Drawing.Point(45, 36);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(493, 32);
+            this.label1.Size = new System.Drawing.Size(493, 31);
             this.label1.TabIndex = 0;
             this.label1.Text = "INVENTORY MANAGEMENT SYSTEM";
             // 
@@ -96,12 +96,13 @@ namespace InventoryManagementSystem
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(71)))), ((int)(((byte)(160)))));
             this.label2.Location = new System.Drawing.Point(498, 262);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(129, 17);
+            this.label2.Size = new System.Drawing.Size(116, 17);
             this.label2.TabIndex = 3;
-            this.label2.Text = "@Copy Right Mdemy";
+            this.label2.Text = "@Copy Right Revo";
             // 
             // timer1
             // 
+            this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // WelcomeForm

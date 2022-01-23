@@ -203,9 +203,9 @@ namespace InventoryManagementSystem
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.label2.Location = new System.Drawing.Point(67, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(90, 32);
+            this.label2.Size = new System.Drawing.Size(63, 32);
             this.label2.TabIndex = 11;
-            this.label2.Text = "demy";
+            this.label2.Text = "evo";
             // 
             // label1
             // 
@@ -214,9 +214,9 @@ namespace InventoryManagementSystem
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.label1.Location = new System.Drawing.Point(-1, -3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 51);
+            this.label1.Size = new System.Drawing.Size(74, 51);
             this.label1.TabIndex = 10;
-            this.label1.Text = "M";
+            this.label1.Text = "R";
             // 
             // label3
             // 
@@ -259,9 +259,9 @@ namespace InventoryManagementSystem
             this.label9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(71)))), ((int)(((byte)(160)))));
             this.label9.Location = new System.Drawing.Point(815, 480);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(174, 21);
+            this.label9.Size = new System.Drawing.Size(155, 21);
             this.label9.TabIndex = 1;
-            this.label9.Text = "@Copy Right Mdemy";
+            this.label9.Text = "@Copy Right Revo";
             // 
             // pictureBox1
             // 
