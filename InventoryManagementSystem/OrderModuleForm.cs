@@ -280,6 +280,7 @@ namespace InventoryManagementSystem
             int cal = 0;
             foreach (int item in totalPriceOfCart)
             {
+                
                 cal = cal + item;
             }
             totalPriceOfCart_TextBox.Text =  cal.ToString();
@@ -306,7 +307,7 @@ namespace InventoryManagementSystem
             {
                 
                 datagridValues.Remove(cart_DataGridView.Rows[e.RowIndex].Cells[1].Value.ToString());
-                totalPriceOfCart.Remove(Convert.ToInt32(cart_DataGridView.Rows[e.RowIndex].Cells[3].Value));
+                totalPriceOfCart.Remove(Convert.ToInt32(cart_DataGridView.Rows[e.RowIndex].Cells[4].Value));
                 //MessageBox.Show("The Value from Grid is : " + cart_DataGridView.Rows[e.RowIndex].Cells[3].Value.ToString());
 
                 cart_DataGridView.Rows.RemoveAt(e.RowIndex);
@@ -400,7 +401,7 @@ namespace InventoryManagementSystem
 
                             //Draw Columns                 
                             iTopMargin = e.MarginBounds.Top;
-                            for (int i = 0; i < cart_DataGridView.Columns.Count - 1; i++)
+                            for (int i = 0; i < cart_DataGridView.Columns.Count - 2; i++)
                             {
                                 e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
                                     new Rectangle((int)arrColumnLefts[iCount], iTopMargin,
@@ -444,7 +445,7 @@ namespace InventoryManagementSystem
                         }
                         iCount = 0;
                         //Draw Columns Contents
-                        for (int i = 0; i < GridRow.Cells.Count - 1; i++)
+                        for (int i = 0; i < GridRow.Cells.Count - 2; i++)
                         {
                             if (GridRow.Cells[i].Value != null)
                             {
